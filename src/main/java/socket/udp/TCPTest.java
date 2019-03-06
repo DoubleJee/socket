@@ -64,11 +64,17 @@ class TCPServer {
 class TCPClient {
     public static void main(String[] args) throws IOException {
         //创建socket客户端
-        Socket socket = new Socket("127.0.0.1", 10200);
+        Socket socket = new Socket("127.0.0.1", 8080);
+        System.out.println("连接服务器成功.....");
         //获取客户端输出流
         OutputStream outputStream = socket.getOutputStream();
         //写入数据到输出流
         outputStream.write("gzz联合王国来入侵了".getBytes());
+        InputStream inputStream = socket.getInputStream();
+        byte[] dataByte = new byte[1024];
+        inputStream.read(dataByte);
+        String result = new String(dataByte);
+        System.out.println("服务器返回数据：" + result);
         //关闭TCP客户端
         socket.close();
     }
