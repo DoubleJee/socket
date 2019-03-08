@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
@@ -20,11 +19,11 @@ class DirectBuffer{
         FileChannel outChannel = FileChannel.open(Paths.get("C:/Users/cd_new_01/Desktop/myPlay-copy.mp4"),StandardOpenOption.READ,StandardOpenOption.WRITE,StandardOpenOption.CREATE);
         //将该通道文件的一个区域直接映射到内存中。
         MappedByteBuffer inByteBuffer = inChannel.map(FileChannel.MapMode.READ_ONLY, 0l, inChannel.size());
-//        //将该通道文件的一个区域直接映射到内存中。
-//        MappedByteBuffer outByteBuffer = outChannel.map(FileChannel.MapMode.READ_WRITE, 0L, inChannel.size());
-//        outByteBuffer.put(inByteBuffer);
-        //将缓冲区的数据，写入通道
-        outChannel.write(inByteBuffer);
+        //将该通道文件的一个区域直接映射到内存中。
+        MappedByteBuffer outByteBuffer = outChannel.map(FileChannel.MapMode.READ_WRITE, 0l, inChannel.size());
+        //修改物理内存写入映射文件，直接映射到物理磁盘
+        outByteBuffer.put(inByteBuffer);
+        //关闭通道
         inChannel.close();
         outChannel.close();
         long endTime = System.currentTimeMillis();
