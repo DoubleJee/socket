@@ -47,5 +47,22 @@ public class ByteBufferTest {
         System.out.println("缓冲区最大容量：" + byteBuffer.capacity());
         System.out.println("-------------------------------------------");
 
+
+        byte[] markData = new byte[5];
+        byteBuffer.get(markData,0,2);
+        System.out.println("数据：" + new String(markData));
+        System.out.println("缓冲区当前操作下标：" + byteBuffer.position());
+        //标记当前position的值
+        byteBuffer.mark();
+
+        byteBuffer.get(markData,2,2);
+        System.out.println("数据：" + new String(markData));
+        System.out.println("缓冲区当前操作下标：" + byteBuffer.position());
+        // 重置position为mark标记的值
+        byteBuffer.reset();
+        byteBuffer.get(markData,0,2);
+        System.out.println("数据：" + new String(markData));
+        System.out.println("缓冲区当前操作下标：" + byteBuffer.position());
+
     }
 }
