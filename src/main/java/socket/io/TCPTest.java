@@ -1,4 +1,4 @@
-package socket.udp;
+package socket.io;
 
 import java.io.IOException;
 import java.io.InputStream;
