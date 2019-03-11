@@ -11,7 +11,7 @@ class TcpNioClient {
     public static void main(String[] args) throws IOException, InterruptedException {
         //创建socket客户端通道
         SocketChannel channel = SocketChannel.open(new InetSocketAddress("127.0.0.1", 8080));
-        //设置 通道异步非阻塞
+        //设置 通道非阻塞
         channel.configureBlocking(false);
         //创建缓冲区
         ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
@@ -35,35 +35,36 @@ class TcpNioServer {
     public static void main(String[] args) throws IOException {
         //获取 socket服务器通道
         ServerSocketChannel channel = ServerSocketChannel.open();
-        //设置 通道异步非阻塞
+        //设置 通道非阻塞
         channel.configureBlocking(false);
-        //绑定 服务器通道连接端口
+        //绑定 服务器socket通道连接端口，监听连接
         channel.bind(new InetSocketAddress(8080));
         System.out.println("TCP服务器已经启动.......");
         //创建选择器
         Selector selector = Selector.open();
-        //将服务器通道注册到选择器上，并监听指定事件，（已经准备好接受的事件）
+        //将服务器socket通道注册到选择器上，并指定注册事件，（接受就绪事件）
         channel.register(selector, SelectionKey.OP_ACCEPT);
         System.out.println("TCP服务器等待接收服务器请求.......");
-        //判断选择器是否有接受到的事件
+        //当有注册的事件就绪到达时，方法返回 ，没有的话会阻塞。
         while (selector.select() > 0) {
+            //获取就绪事件集合
             Iterator<SelectionKey> iterator = selector.selectedKeys().iterator();
             while (iterator.hasNext()) {
                 SelectionKey selectionKey = iterator.next();
-                //判断此事件 是否已经准备好接受
+                //判断此事件 是否接受就绪
                 if (selectionKey.isAcceptable()) {
                     //获取此事件关联的socket通道
                     SocketChannel socketChannel = channel.accept();
-                    //设置 通道异步非阻塞
+                    //设置 通道非阻塞
                     socketChannel.configureBlocking(false);
-                    //将此通道注册到选择器，并监听指定事件，（数据就绪可读的事件）
+                    //将此socket通道注册到选择器，并指定注册事件。（可读就绪事件）
                     socketChannel.register(selector, SelectionKey.OP_READ);
                 }
-                //判断此事件 数据是否已经就绪可读
+                //判断此事件 是否可读就绪
                 if (selectionKey.isReadable()) {
                     //获取此事件关联的socket通道
                     SocketChannel socketChannel = (SocketChannel) selectionKey.channel();
-                    //设置 通道异步非阻塞
+                    //设置 通道非阻塞
                     socketChannel.configureBlocking(false);
                     //创建缓冲区接收数据
                     ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
@@ -80,7 +81,7 @@ class TcpNioServer {
                     //关闭 通道
                     socketChannel.close();
                 }
-
+                //删除此事件避免重复
                 iterator.remove();
             }
         }
