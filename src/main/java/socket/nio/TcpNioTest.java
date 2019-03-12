@@ -34,16 +34,16 @@ class TcpNioClient {
 class TcpNioServer {
     public static void main(String[] args) throws IOException {
         //获取 socket服务器通道
-        ServerSocketChannel channel = ServerSocketChannel.open();
+        ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
         //设置 通道非阻塞
-        channel.configureBlocking(false);
+        serverSocketChannel.configureBlocking(false);
         //绑定 服务器socket通道连接端口，监听连接
-        channel.bind(new InetSocketAddress(8080));
+        serverSocketChannel.bind(new InetSocketAddress(8080));
         System.out.println("TCP服务器已经启动.......");
         //创建选择器
         Selector selector = Selector.open();
-        //将服务器socket通道注册到选择器上，并指定注册事件，（接受就绪事件）
-        channel.register(selector, SelectionKey.OP_ACCEPT);
+        //将服务器型socket通道注册到选择器上，并指定注册事件，（连接接受就绪事件）
+        serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
         System.out.println("TCP服务器等待接收服务器请求.......");
         //当有注册的事件就绪到达时，方法返回 ，没有的话会阻塞。
         while (selector.select() > 0) {
@@ -51,16 +51,16 @@ class TcpNioServer {
             Iterator<SelectionKey> iterator = selector.selectedKeys().iterator();
             while (iterator.hasNext()) {
                 SelectionKey selectionKey = iterator.next();
-                //判断此事件 是否接受就绪
+                //判断此事件 是否连接接受就绪
                 if (selectionKey.isAcceptable()) {
                     //获取此事件关联的socket通道
-                    SocketChannel socketChannel = channel.accept();
+                    SocketChannel socketChannel = serverSocketChannel.accept();
                     //设置 通道非阻塞
                     socketChannel.configureBlocking(false);
-                    //将此socket通道注册到选择器，并指定注册事件。（可读就绪事件）
+                    //将此socket通道注册到选择器，并指定注册事件。（读就绪事件）
                     socketChannel.register(selector, SelectionKey.OP_READ);
                 }
-                //判断此事件 是否可读就绪
+                //判断此事件 是否读就绪
                 if (selectionKey.isReadable()) {
                     //获取此事件关联的socket通道
                     SocketChannel socketChannel = (SocketChannel) selectionKey.channel();
@@ -86,7 +86,7 @@ class TcpNioServer {
             }
         }
         selector.close();
-        channel.close();
+        serverSocketChannel.close();
     }
 
 }
