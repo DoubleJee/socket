@@ -2,11 +2,13 @@ package netty;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 
@@ -22,7 +24,7 @@ class ServerChannelHandler extends ChannelHandlerAdapter {
         Channel channel = ctx.channel();
         String text = (String) msg;
         System.out.println("收到客户端 " + channel.remoteAddress() + "\t" + channel.id() + " 消息：" + text);
-        channel.writeAndFlush(new Scanner(System.in).next());
+        channel.writeAndFlush(new Scanner(System.in).next() + "~!gzz!~");
     }
 
     // 异常捕捉事件
@@ -59,7 +61,7 @@ class ClientChannelHandler extends ChannelHandlerAdapter {
         Channel channel = ctx.channel();
         String text = (String) msg;
         System.out.println("收到服务器 " + channel.remoteAddress() + "\t" + channel.id() + " 消息：" + text);
-        channel.writeAndFlush(new Scanner(System.in).next());
+        channel.writeAndFlush(new Scanner(System.in).next() + "~!gzz!~");
     }
 
     // 异常捕捉事件
@@ -104,6 +106,9 @@ class Netty5Server {
         serverBootstrap.childHandler(new ChannelInitializer<NioSocketChannel>() {
             @Override
             protected void initChannel(NioSocketChannel ch) throws Exception {
+                ByteBuf byteBuf = Unpooled.copiedBuffer("~!gzz!~".getBytes());
+                //设置TCP通道传输粘包解码器
+                ch.pipeline().addLast(new DelimiterBasedFrameDecoder(1024,byteBuf));
                 //设置协助通道事件处理者数据编码器
                 ch.pipeline().addLast(new StringEncoder());
                 //设置协助通道事件处理者数据解码器
@@ -139,6 +144,9 @@ class Netty5Client {
         bootstrap.handler(new ChannelInitializer<NioSocketChannel>() {
             @Override
             protected void initChannel(NioSocketChannel ch) throws Exception {
+                ByteBuf byteBuf = Unpooled.copiedBuffer("~!gzz!~".getBytes());
+                //设置TCP通道传输粘包解码器
+                ch.pipeline().addLast(new DelimiterBasedFrameDecoder(1024,byteBuf));
                 //设置协助通道事件处理者数据编码器
                 ch.pipeline().addLast(new StringEncoder());
                 //设置协助通道事件处理者数据解码器
@@ -149,7 +157,7 @@ class Netty5Client {
         });
         System.out.println("Netty5客户端已开启.....");
         ChannelFuture channelFuture = bootstrap.connect("127.0.0.1", 8080).sync();
-        channelFuture.channel().writeAndFlush("在吗？");
+        channelFuture.channel().writeAndFlush("在吗？~!gzz!~");
         channelFuture.channel().closeFuture().sync();
         work.shutdownGracefully();
     }
