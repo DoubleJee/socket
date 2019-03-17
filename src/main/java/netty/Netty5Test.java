@@ -27,27 +27,18 @@ class ServerChannelHandler extends ChannelHandlerAdapter {
         channel.writeAndFlush(new Scanner(System.in).next() + "~!gzz!~");
     }
 
+    //通道读取完毕事件（读取完客户端数据事件）
+    @Override
+    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+        super.channelReadComplete(ctx);
+        System.out.println("数据已经读完");
+    }
+
     // 异常捕捉事件
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         super.exceptionCaught(ctx, cause);
         System.out.println("异常捕捉事件....");
-    }
-
-    // 通道断开连接事件
-    @Override
-    public void disconnect(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
-        super.disconnect(ctx, promise);
-        System.out.println("通道断开事件....");
-
-    }
-
-    // 通道关闭事件
-    @Override
-    public void close(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
-        super.close(ctx, promise);
-        System.out.println("通道关闭了....");
-
     }
 }
 
@@ -69,22 +60,6 @@ class ClientChannelHandler extends ChannelHandlerAdapter {
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         super.exceptionCaught(ctx, cause);
         System.out.println("异常捕捉事件....");
-    }
-
-    // 通道断开连接事件
-    @Override
-    public void disconnect(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
-        super.disconnect(ctx, promise);
-        System.out.println("通道断开事件....");
-
-    }
-
-    // 通道关闭事件
-    @Override
-    public void close(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
-        super.close(ctx, promise);
-        System.out.println("通道关闭了....");
-
     }
 }
 
